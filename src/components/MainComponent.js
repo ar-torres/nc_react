@@ -7,21 +7,23 @@ import Footer from "./FooterComponent";
 import Home from "./HomeComponent";
 import Contact from "./ContactComponent";
 import { Switch, Route, Redirect, withRouter } from "react-router-dom";
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
+import { addComment } from "../redux/ActionCreators";
 
-const mapStateToProps = state => {
-    return {
-        campsites: state.campsites,
-        comments: state.comments,
-        partners: state.partners,
-        promotions: state.promotions
-    };
+const mapStateToProps = (state) => {
+	return {
+		campsites: state.campsites,
+		comments: state.comments,
+		partners: state.partners,
+		promotions: state.promotions,
+	};
 };
 
+const mapDispatchToProps = {
+	addComment: (campsiteId, rating, author, text) => addComment(campsiteId, rating, author, text),
+};
 
 class Main extends Component {
-	
-
 	render() {
 		const HomePage = () => {
 			return (
@@ -35,10 +37,11 @@ class Main extends Component {
 
 		const CampsiteWithId = ({ match }) => {
 			return (
-				<CampsiteInfo
-					campsite={this.props.campsites.filter((campsite) => campsite.id === +match.params.campsiteId)[0]}
-					comments={this.props.comments.filter((comment) => comment.campsiteId === +match.params.campsiteId)}
-				/>
+				<CampsiteInfo 
+                    campsite={this.props.campsites.filter(campsite => campsite.id === +match.params.campsiteId)[0]} 
+                    comments={this.props.comments.filter(comment => comment.campsiteId === +match.params.campsiteId)}
+                    addComment={this.props.addComment}
+                />
 			);
 		};
 
@@ -49,7 +52,7 @@ class Main extends Component {
 					<Route path="/home" component={HomePage} />
 					<Route exact path="/directory" render={() => <Directory campsites={this.props.campsites} />} />
 					<Route path="/directory/:campsiteId" component={CampsiteWithId} />
-					<Route exact path="/aboutus" render={() => <About partners={this.props.partners} />}/>
+					<Route exact path="/aboutus" render={() => <About partners={this.props.partners} />} />
 					<Route exact path="/contactus" component={Contact} />
 					<Redirect to="/home" />
 				</Switch>
@@ -59,4 +62,4 @@ class Main extends Component {
 	}
 }
 
-export default withRouter(connect(mapStateToProps)(Main));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Main));
